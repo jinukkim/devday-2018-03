@@ -18,31 +18,82 @@ struct DatabaseMiddleware {
     ConnPtr conn;
   };
 
-  DatabaseMiddleware() : engine_("mysql://crow:crow@127.0.0.1/flask") {
+  DatabaseMiddleware() : engine_() {
   }
 
+  void initialize(const std::string &connection_string) {
+    engine_ = std::make_unique<crow::db::mysql::Engine>(connection_string);
+  }
+
+  __attribute__((noinline))
   void before_handle(crow::request &, crow::response &, context &ctxt) {
-    ctxt.conn = engine_.connect();
+    ctxt.conn = engine_->connect();
   }
 
+  __attribute__((noinline))
   void after_handle(crow::request &, crow::response &, context &) {
   }
 
-  crow::db::mysql::Engine engine_;
+  std::unique_ptr<crow::db::mysql::Engine> engine_;
 };
 
 
-using CrowApp = crow::App<DatabaseMiddleware>;
+struct DnsReverseLookupMiddleware {
+  struct context {
+  };
+
+  __attribute__((noinline))
+  void before_handle(crow::request &req, crow::response &, context &ctxt) {
+    boost::asio::ip::tcp::resolver resolver(*req.io_service);
+    boost::system::error_code ec;
+    boost::asio::ip::tcp::resolver::iterator ie, it =
+        resolver.resolve(req.remote_addr, ec);
+    if (it != ie) {
+      req.add_header("REMOTE_ADDR", it->host_name());
+    }
+  }
+
+  __attribute__((noinline))
+  void after_handle(crow::request &, crow::response &, context &) {
+  }
+};
+
+
+using CrowApp = crow::App<DatabaseMiddleware, DnsReverseLookupMiddleware>;
+
+
+std::string HandleIndex(CrowApp &app, const crow::request &req) {
+  auto &ctxt = app.get_context<DatabaseMiddleware>(req);
+  auto result = ctxt.conn->execute<int, std::string, std::string>(
+      "SELECT id, title, body FROM entries ORDER BY id DESC");
+
+  std::vector<crow::json::wvalue> posts;
+  for (auto row : result) {
+    crow::json::wvalue post;
+    post["id"] = crow::db::get<0>(row);
+    post["title"] = crow::db::get<1>(row);
+    post["text"] = crow::db::get<2>(row);
+    posts.emplace_back(std::move(post));
+  }
+
+//  if (posts.empty()) {
+//    int *x = 0;
+//    *x = 0;
+//  }
+
+  crow::json::wvalue res;
+  res["posts"] = std::move(posts);
+
+  return crow::json::dump(res);
+}
 
 
 std::unique_ptr<CrowApp> CreateApp() {
   std::unique_ptr<CrowApp> _app = std::make_unique<CrowApp>();
   CrowApp &app = *_app;
 
-  CROW_ROUTE(app, "/") ([]() {
-        crow::json::wvalue res;
-        res["message"] = "Hello, world";
-        return res;
+  CROW_ROUTE(app, "/") ([app=&app](const crow::request& req) {
+      return HandleIndex(*app, req);
      });
 
   return _app;
@@ -51,6 +102,11 @@ std::unique_ptr<CrowApp> CreateApp() {
 
 int main(int, char**) {
   auto app = CreateApp();
+
+  app->get_middleware<DatabaseMiddleware>().initialize(
+      //"mysql://crow:crow@127.0.0.1/flask");
+      "mysql://crow:crow@10.10.0.255/crow");
+
   app->port(18080).concurrency(4).run();
   return 0;
 }

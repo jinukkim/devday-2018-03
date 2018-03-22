@@ -10,7 +10,8 @@ endif()
 
 
 include_directories(/usr/include/mariadb)
-find_library(libmariadb libmariadb.so PATHS /usr/lib/mariadb /usr/lib64/mariadb)
+find_library(libmariadb libmariadb.so PATHS /usr/lib/mariadb /usr/lib64/mariadb REQUIRED)
+find_library(libjemalloc libjemalloc.so REQUIRED)
 
 
 find_program(CCACHE_FOUND ccache)
@@ -29,7 +30,6 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++1y -pedantic -Wextra")
 find_package(Boost 1.52 COMPONENTS system thread REQUIRED)
-find_library(libjemalloc libjemalloc.so REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
 
@@ -38,10 +38,10 @@ set(PROJECT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 include_directories("${PROJECT_INCLUDE_DIR}")
 
 
-
 add_executable(flaskr flask.cc)
-target_link_libraries(flaskr
+target_link_libraries(
+    flaskr
+    ${libjemalloc}
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${libmariadb}
-    ${libjemalloc})
+    ${libmariadb})
