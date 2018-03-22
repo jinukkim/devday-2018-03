@@ -8,6 +8,11 @@ if(OPENSSL_FOUND)
 	include_directories(${OPENSSL_INCLUDE_DIR})
 endif()
 
+
+include_directories(/usr/include/mariadb)
+find_library(libmariadb libmariadb.so PATHS /usr/lib/mariadb /usr/lib64/mariadb)
+
+
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
   message("Found ccache ${CCACHE_FOUND}")
@@ -38,4 +43,5 @@ add_executable(flaskr flask.cc)
 target_link_libraries(flaskr
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${libmariadb}
     ${libjemalloc})
