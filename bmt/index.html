@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-US" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>iFunFactory Devday 2018: 게임 서버 성능 분석</title>
+</head>
+<body>
+  <div id="page" class="site">
+    <h2>Flamegraph 예제 flaskr (debug build)</h2>
+    <p><a href="./profile-flaskr.svg"><img src="./_thumb_crop_profile-flaskr.png" /></a>
+    </p>
+
+    <h2>Flamegraph: flaskr (release build)</h2>
+    <p>
+    <a href="./profile-flaskr-remote.svg"><img src="./_thumb_crop_profile-flaskr-remote.png" /></a>
+    </p>
+
+    <h2>MariaDB 쿼리 실행 시간</h2>
+    <p>
+      <a href="./mysql_real_query.svg"><img src="./_thumb_crop_mysql_real_query.png" /></a>
+      <a href="./mysql_fetch_row.svg"><img src="./_thumb_crop_mysql_fetch_row.png" /></a>
+      <a href="./mysql_fetch_fields.svg"><img src="./_thumb_crop_mysql_fetch_fields.png" /></a>
+      <a href="./mysql_free_result.svg"><img src="./_thumb_crop_mysql_free_result.png" /></a>
+    </p>
+
+    <h2>flaskr: 대기 시간 (offcputime)</h2>
+    <p>
+    <a href="./flaskr-offcpu.svg"><img src="./_thumb_crop_flaskr-offcpu.png" /></a>
+    </p>
+
+    <h2>flaskr: 대기 시간 반대편 콜스택 (offwaketime)</h2>
+    <p>
+    <a href="./flaskr-waker.svg"><img src="./_thumb_crop_flaskr-waker.png" /></a>
+    </p>
+
+    <h2>getnameinfo 실행 시간 분포</h2>
+    <p>
+    <a href="./getnameinfo-remote.svg"><img src="./_thumb_crop_getnameinfo-remote.png" /></a>
+    <a href="./getnameinfo.svg"><img src="./_thumb_crop_getnameinfo.png" /></a>
+    </p>
+  </div>
+</body>
+</html>
