@@ -56,7 +56,7 @@ namespace crow
         namespace mysql
         {
             template <typename T>
-            T convert_data(char* data, MYSQL_FIELD& field, unsigned long length)
+            T convert_data(char* data, MYSQL_FIELD& /*field*/, unsigned long length)
             {
                 if (!data)
                     return {};

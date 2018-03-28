@@ -43,7 +43,7 @@ struct DnsReverseLookupMiddleware {
   };
 
   __attribute__((noinline))
-  void before_handle(crow::request &req, crow::response &, context &ctxt) {
+  void before_handle(crow::request &req, crow::response &, context &) {
     boost::asio::ip::tcp::resolver resolver(*req.io_service);
     boost::system::error_code ec;
     boost::asio::ip::tcp::resolver::iterator ie, it =

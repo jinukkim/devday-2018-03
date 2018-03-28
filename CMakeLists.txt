@@ -45,3 +45,5 @@ target_link_libraries(
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${libmariadb})
+
+  #set_target_properties(flaskr PROPERTIES COMPILE_FLAGS "-pg")
