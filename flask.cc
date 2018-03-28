@@ -76,11 +76,6 @@ std::string HandleIndex(CrowApp &app, const crow::request &req) {
     posts.emplace_back(std::move(post));
   }
 
-//  if (posts.empty()) {
-//    int *x = 0;
-//    *x = 0;
-//  }
-
   crow::json::wvalue res;
   res["posts"] = std::move(posts);
 
@@ -104,8 +99,7 @@ int main(int, char**) {
   auto app = CreateApp();
 
   app->get_middleware<DatabaseMiddleware>().initialize(
-      //"mysql://crow:crow@127.0.0.1/flask");
-      "mysql://crow:crow@10.10.0.255/crow");
+      "mysql://crow:crow@127.0.0.1/flask");
 
   app->port(18080).concurrency(4).run();
   return 0;
